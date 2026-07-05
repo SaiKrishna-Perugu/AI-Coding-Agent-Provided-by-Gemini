@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 
 def is_within_directory(directory, path):
     """Check if a path is within a directory."""
@@ -26,3 +27,22 @@ def write_file(working_directory: str, file_path: str, content: str) -> str:
         return (f'Successfully wrote to "{file_path} ({len(content)} characters written)')
     except Exception as e:
         return f'Failed to write to file: {file_path}, {e}'
+
+
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+        description="Overwrites an existing file or writes to a new file if doesn't exist( and create required parent dirs safely), Constrained to the working directory",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The path to the file to write.",
+            ),
+            "contents": types.Schema(
+                type=types.Type.STRING,
+                description="The contents to write to the file as a string.",
+            )
+        },
+    ),
+)

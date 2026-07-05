@@ -1,5 +1,6 @@
 import os
 import subprocess
+from google.genai import types
 
 def is_within_directory(directory, path):
     """Check if a path is within a directory."""
@@ -40,3 +41,25 @@ def run_python_file(working_directory: str, file_path: str, args: list[str] | No
         return final_string
     except Exception as e:
         return  f"Error: executing Pytho file: {e}"
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Runs a Python file with the python3 interpreter and optional CLI arguments",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Path to the Python file to run, relative to the working directory",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="Optional array of string CLI arguments for the Python file",
+                items=types.Schema(
+                    type=types.Type.STRING
+                ),
+            ),
+        },
+        # required=["file_path"],
+    ),
+)
