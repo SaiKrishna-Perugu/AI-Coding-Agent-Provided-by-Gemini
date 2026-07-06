@@ -3,7 +3,6 @@ import sys
 
 from dotenv import load_dotenv
 from google import genai
-from google.genai import errors as google_errors
 from google.genai import types
 
 from functions.get_files_info import schema_get_files_info
@@ -13,7 +12,7 @@ from functions.write_file import schema_write_file
 
 
 def main():
-    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+    load_dotenv()
 
     if len(sys.argv) < 2:
         print("Usage: uv run main.py <prompt> [--verbose]")
@@ -61,28 +60,11 @@ All paths you provide should be relative to the working directory. You do not ne
         tools=[available_functions],
     )
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash-001",
-            contents=messages[0],
-            config=config,
-        )
-    except google_errors.ClientError as exc:
-        if verbose_flag:
-            raise
-
-        status_code = getattr(exc, "status_code", None)
-        response_json = getattr(exc, "response_json", None)
-        message = str(exc)
-
-        if status_code == 429 or "RESOURCE_EXHAUSTED" in message:
-            print("Gemini API quota exceeded. Please wait a few minutes and try again, or use a different API key/plan.")
-        else:
-            print(f"Gemini API request failed: {message}")
-
-        if response_json:
-            print(f"Details: {response_json}")
-        sys.exit(1)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-001",
+        contents=messages[0],
+        config=config,
+    )
 
     if verbose_flag:
         print(f"Response object: {response}")
